@@ -1,0 +1,60 @@
+sources:
+  - name: BBC World
+    url: https://feeds.bbci.co.uk/news/world/rss.xml
+  - name: Al Jazeera
+    url: https://www.aljazeera.com/xml/rss/all.xml
+  - name: The Guardian
+    url: https://www.theguardian.com/world/rss
+  - name: Deutsche Welle
+    url: https://rss.dw.com/rdf/rss-en-world
+
+# LLM settings
+llm_batch_size: 32
+active_llm_settings: "geopolitics_prompt.yaml"
+
+# Zero Shot model settings
+zero_shot_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+zero_shot_batch_size: 128
+categories:
+  - geopolitics:
+      model_label: geopolitics
+      threshold: 0.75
+  - economy:
+      model_label: economy
+      threshold: 0.7
+
+# Embedding model settings
+embedding_model: nomic-ai/nomic-embed-text-v2-moe
+embedding_batch_size: 512
+
+# Grouping settings
+grouping_batch_size: 512
+distance_threshold: 0.15
+overlap_threshold: 0.5
+
+# TASKS
+tasks:
+  - id: "heavy_retrain"
+    trigger: "cron"
+    params:
+      day_of_week: "mon,wed,fri"
+      hour: 10
+      minute: 30
+
+  - id: "daily_pipeline"
+    trigger: "cron"
+    params:
+      hour: 0
+      minute: 0
+
+  - id: "interval_pipeline"
+    trigger: "interval"
+    params:
+      hours: 1
+
+  - id: "test"
+    trigger: "cron"
+    params:
+      day_of_week: "mon,wed,fri,tue,sat"
+      hour: 17
+      minute: 07

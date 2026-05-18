@@ -1,0 +1,110 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+conda_env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.swdb
+database.db
+
+# Large model files and cache
+models/cache/
+models/LLM/*.gguf
+models/LLM/*.bin
+models/LLM/*.safetensors
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*_backup.*
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+Desktop.ini
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Backups and dumps
+*.sql_backup
+*_backup.sql
+articles_table_backup.sql
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IPython
+.ipython/
+.ipynb_checkpoints/
+
+# Node (if applicable)
+node_modules/
+npm-debug.log
+
+# Docker
+.dockerignore

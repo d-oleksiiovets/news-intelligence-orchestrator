@@ -1,0 +1,88 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: news_intelligence_orchestrator_database
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-12345}
+      POSTGRES_DB: ${POSTGRES_DB:-news_production}
+      POSTGRES_INITDB_ARGS: "-c max_connections=200"
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - news_intelligence_orchestrator_network
+    
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: news_intelligence_orchestrator_app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-12345}
+      POSTGRES_DB: ${POSTGRES_DB:-news_production}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      API_KEY: ${API_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./models:/app/models
+      - ./logs:/app/logs
+    ports:
+      - "8501:8501"  # Streamlit dashboard
+    networks:
+      - news_intelligence_orchestrator_network
+    command: 
+      - sh
+      - -c
+      - |
+        echo "Waiting for database..."
+        sleep 10
+        echo "Running migrations..."
+        python -c "from alembic.config import Config; from alembic import command; cfg = Config('alembic.ini'); command.upgrade(cfg, 'head')"
+        tail -f /dev/null
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: news_intelligence_orchestrator_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@local.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - news_intelligence_orchestrator_network
+
+volumes:
+  pg_data:
+  pgadmin_data:
+
+networks:
+  news_intelligence_orchestrator_network:
+    driver: bridge
+      
